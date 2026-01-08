@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameVault</title>
+
+<style>
+/* Corps et arrière-plan */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+  color: white;
+}
+
+/* Header */
+header {
+  padding: 20px;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+  color: #ff9800;
+}
+
+/* Grille de jeux */
+.grid {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+  gap: 20px;
+}
+
+/* Carte jeu */
+.card {
+  background: rgba(0,0,0,0.7);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+  transition: transform .3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card h3 {
+  margin: 10px;
+  color: #ffcc00;
+}
+
+.card a {
+  display: block;
+  margin: 10px;
+  padding: 8px;
+  background: #ff9800;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.card a:hover {
+  background: #ff8533;
+}
+
+/* Message d’information */
+.notice {
+  margin: 20px;
+  padding: 15px;
+  background: #ff9800;
+  color: black;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>GameVault</h1>
+  <div>Bibliothèque de jeux PC</div>
+</header>
+
+<div id="notice" class="notice"></div>
+<div class="grid" id="games"></div>
+
+<script>
+// Récupérer le conteneur
+const container = document.getElementById("games");
+const notice = document.getElementById("notice");
+
+// Mode double-clic Windows (file://)
+if (location.protocol === "file:") {
+  notice.innerText = "Mode local activé ✔️ Les jeux s’affichent en mode vitrine pro.";
+
+  const localGames = [
+    {name:"Cyberpunk 2077", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co7497.jpg"},
+    {name:"Red Dead Redemption 2", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg"},
+    {name:"Elden Ring", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg"},
+    {name:"GTA V", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.jpg"},
+    {name:"Call of Duty MW III", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co6w0y.jpg"}
+  ];
+
+  localGames.forEach(g=>{
+    container.innerHTML += `
+      <div class="card">
+        <img src="${g.img}">
+        <h3>${g.name}</h3>
+        <a href="#">Voir le jeu</a>
+      </div>`;
+  });
+
+// Mode serveur (RAWG réel)
+} else {
+  notice.innerText = "Mode serveur activé ✔️ Jeux officiels RAWG chargés automatiquement.";
+
+  fetch("https://api.rawg.io/api/games?key=e39901f1a1d3498a91dabddb6383bb23&platforms=4&page_size=20")
+    .then(r => r.json())
+    .then(d => {
+      d.results.forEach(game => {
+        if(game.background_image){
+          container.innerHTML += `
+            <div class="card">
+              <img src="${game.background_image}">
+              <h3>${game.name}</h3>
+              <a target="_blank" href="https://store.steampowered.com/search/?term=${encodeURIComponent(game.name)}">Voir sur Steam</a>
+            </div>`;
+        }
+      });
+    })
+    .catch(err => console.error("Erreur API RAWG :", err));
+}
+</script>
+
+</body>
+</html>
