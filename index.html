@@ -6,86 +6,128 @@
 <title>GameVault</title>
 
 <style>
-/* Corps et arrière-plan */
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ===== BACKGROUND ===== */
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
-  color: white;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background:
+    linear-gradient(rgba(0,0,0,.75), rgba(0,0,0,.9)),
+    url("https://images.unsplash.com/photo-1542751371-adc38448a05e");
+  background-size: cover;
+  background-attachment: fixed;
+  color: #fff;
 }
 
-/* Header */
+/* ===== HEADER ===== */
 header {
-  padding: 20px;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 25px;
+  text-align: center;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
 }
 
 header h1 {
-  margin: 0;
   color: #ff9800;
+  font-size: 2.5em;
+  margin-bottom: 10px;
 }
 
-/* Grille de jeux */
-.grid {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-  gap: 20px;
+/* ===== SEARCH BAR ===== */
+.search-box {
+  max-width: 500px;
+  margin: 20px auto;
+  position: relative;
 }
 
-/* Carte jeu */
-.card {
-  background: rgba(0,0,0,0.7);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 0 15px rgba(0,0,0,0.6);
-  transition: transform .3s;
-}
-
-.card:hover {
-  transform: scale(1.05);
-}
-
-.card img {
+.search-box input {
   width: 100%;
-  height: 150px;
-  object-fit: cover;
+  padding: 14px 45px 14px 15px;
+  border-radius: 30px;
+  border: none;
+  font-size: 16px;
+  outline: none;
 }
 
-.card h3 {
-  margin: 10px;
-  color: #ffcc00;
+.search-box span {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #555;
 }
 
-.card a {
-  display: block;
-  margin: 10px;
-  padding: 8px;
-  background: #ff9800;
-  color: black;
-  text-align: center;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-}
-
-.card a:hover {
-  background: #ff8533;
-}
-
-/* Message d’information */
+/* ===== NOTICE ===== */
 .notice {
   margin: 20px;
   padding: 15px;
   background: #ff9800;
-  color: black;
+  color: #000;
+  text-align: center;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+/* ===== GRID ===== */
+.grid {
+  padding: 30px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 25px;
+}
+
+/* ===== CARD ===== */
+.card {
+  background: rgba(0,0,0,0.75);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  transition: transform .3s, box-shadow .3s;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.9);
+}
+
+.card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card h3 {
+  padding: 12px;
+  font-size: 16px;
+  color: #ffcc00;
+}
+
+.card a, .card button {
+  display: block;
+  margin: 10px;
+  padding: 10px;
   border-radius: 8px;
   font-weight: bold;
   text-align: center;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
 }
+
+.card a {
+  background: #2196f3;
+  color: #fff;
+}
+
+.card button {
+  background: #ff9800;
+  color: #000;
+}
+
+.card a:hover { background: #1e88e5; }
+.card button:hover { background: #ffb74d; }
 </style>
 </head>
 
@@ -93,58 +135,78 @@ header h1 {
 
 <header>
   <h1>GameVault</h1>
-  <div>Bibliothèque de jeux PC</div>
+  <p>Les meilleurs jeux PC payants</p>
+
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Rechercher un jeu PC...">
+    <span>🔍</span>
+  </div>
 </header>
 
-<div id="notice" class="notice"></div>
+<div class="notice" id="notice"></div>
 <div class="grid" id="games"></div>
 
 <script>
-// Récupérer le conteneur
 const container = document.getElementById("games");
 const notice = document.getElementById("notice");
+const searchInput = document.getElementById("search");
+let allGames = [];
 
-// Mode double-clic Windows (file://)
-if (location.protocol === "file:") {
-  notice.innerText = "Mode local activé ✔️ Les jeux s’affichent en mode vitrine pro.";
-
-  const localGames = [
-    {name:"Cyberpunk 2077", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co7497.jpg"},
-    {name:"Red Dead Redemption 2", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg"},
-    {name:"Elden Ring", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg"},
-    {name:"GTA V", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.jpg"},
-    {name:"Call of Duty MW III", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co6w0y.jpg"}
-  ];
-
-  localGames.forEach(g=>{
+/* ===== AFFICHAGE ===== */
+function displayGames(list) {
+  container.innerHTML = "";
+  list.forEach(game => {
     container.innerHTML += `
       <div class="card">
-        <img src="${g.img}">
-        <h3>${g.name}</h3>
-        <a href="#">Voir le jeu</a>
+        <img src="${game.img}">
+        <h3>${game.name}</h3>
+        <a target="_blank" href="https://store.steampowered.com/search/?term=${encodeURIComponent(game.name)}">
+          Voir sur Steam
+        </a>
+        <button onclick="window.open('TON_LIEN_MOMO','_blank')">
+          Payer via MoMo
+        </button>
       </div>`;
   });
-
-// Mode serveur (RAWG réel)
-} else {
-  notice.innerText = "Mode serveur activé ✔️ Jeux officiels RAWG chargés automatiquement.";
-
-  fetch("https://api.rawg.io/api/games?key=e39901f1a1d3498a91dabddb6383bb23&platforms=4&page_size=20")
-    .then(r => r.json())
-    .then(d => {
-      d.results.forEach(game => {
-        if(game.background_image){
-          container.innerHTML += `
-            <div class="card">
-              <img src="${game.background_image}">
-              <h3>${game.name}</h3>
-              <a target="_blank" href="https://store.steampowered.com/search/?term=${encodeURIComponent(game.name)}">Voir sur Steam</a>
-            </div>`;
-        }
-      });
-    })
-    .catch(err => console.error("Erreur API RAWG :", err));
 }
+
+/* ===== MODE LOCAL (double-clic) ===== */
+if (location.protocol === "file:") {
+  notice.innerText = "Mode local activé ✔️ (vitrine)";
+  allGames = [
+    {name:"GTA V", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1tmu.jpg"},
+    {name:"Red Dead Redemption 2", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1q1f.jpg"},
+    {name:"Elden Ring", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.jpg"},
+    {name:"Cyberpunk 2077", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co7497.jpg"},
+    {name:"Call of Duty MW III", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co6w0y.jpg"}
+  ];
+  displayGames(allGames);
+
+/* ===== MODE EN LIGNE (RAWG) ===== */
+} else {
+  notice.innerText = "Chargement des jeux PC...";
+  fetch("https://api.rawg.io/api/games?key=e39901f1a1d3498a91dabddb6383bb23&platforms=4&page_size=40")
+    .then(res => res.json())
+    .then(data => {
+      allGames = data.results
+        .filter(g => g.background_image)
+        .map(g => ({ name: g.name, img: g.background_image }));
+      displayGames(allGames);
+      notice.innerText = "Jeux PC chargés ✔️";
+    })
+    .catch(() => {
+      notice.innerText = "Erreur de chargement des jeux ❌";
+    });
+}
+
+/* ===== RECHERCHE ===== */
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.toLowerCase();
+  const filtered = allGames.filter(g =>
+    g.name.toLowerCase().includes(value)
+  );
+  displayGames(filtered);
+});
 </script>
 
 </body>
