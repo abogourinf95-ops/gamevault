@@ -31,33 +31,31 @@ header h1 {
   margin-bottom: 10px;
 }
 
+/* ===== RECHERCHE ===== */
 .search-box {
   max-width: 500px;
   margin: 20px auto;
-  position: relative;
+  display: flex;
 }
 
 .search-box input {
-  width: 100%;
-  padding: 14px 110px 14px 15px;
-  border-radius: 30px;
+  flex: 1;
+  padding: 14px 15px;
+  border-radius: 30px 0 0 30px;
   border: none;
   font-size: 16px;
   outline: none;
 }
 
 .search-box button {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 10px 15px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 20px;
+  border-radius: 0 30px 30px 0;
   background-color: #ff9800;
   color: #000;
   font-weight: bold;
   cursor: pointer;
+  transition: 0.3s;
 }
 
 .search-box button:hover {
@@ -168,6 +166,7 @@ const searchInput = document.getElementById("search");
 const searchBtn = document.getElementById("searchBtn");
 let allGames = [];
 
+/* ===== AFFICHAGE ===== */
 function displayGames(list) {
   container.innerHTML = "";
   list.forEach(game => {
@@ -185,7 +184,7 @@ function displayGames(list) {
   });
 }
 
-/* ===== MODE LOCAL (double-clic) ===== */
+/* ===== MODE LOCAL ===== */
 if (location.protocol === "file:") {
   notice.innerText = "Mode local activé ✔️ (vitrine)";
   allGames = [
@@ -213,13 +212,14 @@ if (location.protocol === "file:") {
     });
 }
 
-/* ===== BOUTON RECHERCHER ===== */
+/* ===== BOUTON RECHERCHER => REDIRECTION STEAM ===== */
 searchBtn.addEventListener("click", () => {
-  const value = searchInput.value.toLowerCase();
-  const filtered = allGames.filter(g =>
-    g.name.toLowerCase().includes(value)
-  );
-  displayGames(filtered);
+  const value = searchInput.value.trim();
+  if (value) {
+    // Redirection directe vers Steam
+    const steamURL = `https://store.steampowered.com/search/?term=${encodeURIComponent(value)}`;
+    window.open(steamURL, "_blank");
+  }
 });
 
 /* ===== ANNEE DYNAMIQUE FOOTER ===== */
