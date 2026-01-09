@@ -6,10 +6,8 @@
 <title>GameVault</title>
 
 <style>
-/* ===== RESET ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ===== BACKGROUND ===== */
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background:
@@ -20,7 +18,6 @@ body {
   color: #fff;
 }
 
-/* ===== HEADER ===== */
 header {
   padding: 25px;
   text-align: center;
@@ -34,7 +31,6 @@ header h1 {
   margin-bottom: 10px;
 }
 
-/* ===== SEARCH BAR ===== */
 .search-box {
   max-width: 500px;
   margin: 20px auto;
@@ -59,7 +55,6 @@ header h1 {
   color: #555;
 }
 
-/* ===== NOTICE ===== */
 .notice {
   margin: 20px;
   padding: 15px;
@@ -70,7 +65,6 @@ header h1 {
   font-weight: bold;
 }
 
-/* ===== GRID ===== */
 .grid {
   padding: 30px;
   display: grid;
@@ -78,7 +72,6 @@ header h1 {
   gap: 25px;
 }
 
-/* ===== CARD ===== */
 .card {
   background: rgba(0,0,0,0.75);
   border-radius: 15px;
@@ -128,6 +121,15 @@ header h1 {
 
 .card a:hover { background: #1e88e5; }
 .card button:hover { background: #ffb74d; }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.8);
+  font-size: 14px;
+  color: #ccc;
+}
+footer span { color: #ff9800; font-weight: bold; }
 </style>
 </head>
 
@@ -145,6 +147,10 @@ header h1 {
 
 <div class="notice" id="notice"></div>
 <div class="grid" id="games"></div>
+
+<footer>
+  © <span id="year"></span> GameVault — Créé par <span>ABOGOURIN Fayad</span>
+</footer>
 
 <script>
 const container = document.getElementById("games");
@@ -202,11 +208,11 @@ if (location.protocol === "file:") {
 /* ===== RECHERCHE ===== */
 searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
-  const filtered = allGames.filter(g =>
-    g.name.toLowerCase().includes(value)
-  );
-  displayGames(filtered);
+  displayGames(allGames.filter(g => g.name.toLowerCase().includes(value)));
 });
+
+/* ===== ANNEE DYNAMIQUE FOOTER ===== */
+document.getElementById("year").textContent = new Date().getFullYear();
 </script>
 
 </body>
