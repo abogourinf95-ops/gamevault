@@ -39,20 +39,29 @@ header h1 {
 
 .search-box input {
   width: 100%;
-  padding: 14px 45px 14px 15px;
+  padding: 14px 110px 14px 15px;
   border-radius: 30px;
   border: none;
   font-size: 16px;
   outline: none;
 }
 
-.search-box span {
+.search-box button {
   position: absolute;
-  right: 15px;
+  right: 5px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 20px;
-  color: #555;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  background-color: #ff9800;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.search-box button:hover {
+  background-color: #ffb74d;
 }
 
 .notice {
@@ -141,7 +150,7 @@ footer span { color: #ff9800; font-weight: bold; }
 
   <div class="search-box">
     <input type="text" id="search" placeholder="Rechercher un jeu PC...">
-    <span>🔍</span>
+    <button id="searchBtn">Rechercher</button>
   </div>
 </header>
 
@@ -156,9 +165,9 @@ footer span { color: #ff9800; font-weight: bold; }
 const container = document.getElementById("games");
 const notice = document.getElementById("notice");
 const searchInput = document.getElementById("search");
+const searchBtn = document.getElementById("searchBtn");
 let allGames = [];
 
-/* ===== AFFICHAGE ===== */
 function displayGames(list) {
   container.innerHTML = "";
   list.forEach(game => {
@@ -188,7 +197,6 @@ if (location.protocol === "file:") {
   ];
   displayGames(allGames);
 
-/* ===== MODE EN LIGNE (RAWG) ===== */
 } else {
   notice.innerText = "Chargement des jeux PC...";
   fetch("https://api.rawg.io/api/games?key=e39901f1a1d3498a91dabddb6383bb23&platforms=4&page_size=40")
@@ -205,10 +213,13 @@ if (location.protocol === "file:") {
     });
 }
 
-/* ===== RECHERCHE ===== */
-searchInput.addEventListener("input", () => {
+/* ===== BOUTON RECHERCHER ===== */
+searchBtn.addEventListener("click", () => {
   const value = searchInput.value.toLowerCase();
-  displayGames(allGames.filter(g => g.name.toLowerCase().includes(value)));
+  const filtered = allGames.filter(g =>
+    g.name.toLowerCase().includes(value)
+  );
+  displayGames(filtered);
 });
 
 /* ===== ANNEE DYNAMIQUE FOOTER ===== */
