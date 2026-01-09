@@ -166,7 +166,7 @@ const searchInput = document.getElementById("search");
 const searchBtn = document.getElementById("searchBtn");
 let allGames = [];
 
-/* ===== AFFICHAGE ===== */
+/* ===== AFFICHAGE DES JEUX ===== */
 function displayGames(list) {
   container.innerHTML = "";
   list.forEach(game => {
@@ -212,14 +212,21 @@ if (location.protocol === "file:") {
     });
 }
 
-/* ===== BOUTON RECHERCHER => REDIRECTION STEAM ===== */
-searchBtn.addEventListener("click", () => {
-  const value = searchInput.value.trim();
-  if (value) {
-    // Redirection directe vers Steam
-    const steamURL = `https://store.steampowered.com/search/?term=${encodeURIComponent(value)}`;
-    window.open(steamURL, "_blank");
-  }
+/* ===== BOUTON RECHERCHER REDIRECTION STEAM ===== */
+searchBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    const value = searchInput.value.trim();
+    if (value) {
+        const steamURL = `https://store.steampowered.com/search/?term=${encodeURIComponent(value)}`;
+        window.open(steamURL, "_blank"); // ouvre Steam dans un nouvel onglet
+    }
+});
+
+// Recherche via touche Entrée
+searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        searchBtn.click();
+    }
 });
 
 /* ===== ANNEE DYNAMIQUE FOOTER ===== */
